@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 26px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-url {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 13px 15px;
+            font-size: 1rem;
+            color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-url:focus {
+            border-color: #3b82f6;
+        }
+
+        .btn-scan {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 13px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-scan:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-scan:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .samples {
+            margin-top: 14px;
+            font-size: 0.88rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sample {
+            background-color: #334155;
+            color: #e2e8f0;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-sample:hover {
+            background-color: #475569;
+        }
+
+        .alert-error {
+            background-color: #7f1d1d;
+            border: 1px solid #b91c1c;
+            color: #fecaca;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-top: 14px;
+            font-size: 0.95rem;
+        }
+
+        .verdict {
+            text-align: center;
+            font-size: 1.45rem;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 18px;
+            letter-spacing: 0.3px;
+        }
+
+        .verdict-legit {
+            background-color: #064e3b;
+            color: #34d399;
+            border: 1px solid #059669;
+        }
+
+        .verdict-fake {
+            background-color: #7f1d1d;
+            color: #f87171;
+            border: 1px solid #dc2626;
+        }
+
+        @media (max-width: 550px) {
+            .input-row {
+                flex-direction: column;
+            }
+            .btn-scan {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <div class="header">
+            <h1>PhishGuard AI</h1>
+            <p>Phishing Website Detection</p>
+        </div>
+
+        <div class="card">
+            <form onsubmit="scanURL(event)">
+                <div class="input-row">
+                    <input 
+                        type="text" 
+                        id="urlInput" 
+                        class="input-url" 
+                        placeholder="Enter website link here..." 
+                        autocomplete="off" 
+                        required
+                    >
+                    <button type="submit" id="scanBtn" class="btn-scan">Check Link</button>
+                </div>
+                
+                <div class="samples">
+                    <span>Try sample:</span>
+                    <button type="button" class="btn-sample" onclick="setURL('https://www.google.com')">Google</button>
+                    <button type="button" class="btn-sample" onclick="setURL('http://192.168.1.1/paypal-update/login.php?token=xyz')">PayPal</button>
+                </div>
+            </form>
+
+            <div id="errorBox" class="alert-error" style="display: none;"></div>
+
+            <div id="resultBox" style="display: none;">
+                <div id="verdictText" class="verdict"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function setURL(url) {
+            document.getElementById('urlInput').value = url;
+            document.getElementById('errorBox').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'none';
+        }
+
+        async function scanURL(e) {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value.trim();
+            const btn = document.getElementById('scanBtn');
+            const errorBox = document.getElementById('errorBox');
+            const resultBox = document.getElementById('resultBox');
+            const verdictText = document.getElementById('verdictText');
+
+            errorBox.style.display = 'none';
+            resultBox.style.display = 'none';
+
+            if (!url) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error scanning link');
+                }
+
+                if (data.label === 1 || data.result === 'Fake') {
+                    verdictText.textContent = 'Fake';
+                    verdictText.className = 'verdict verdict-fake';
+                } else {
+                    verdictText.textContent = 'Legit Site';
+                    verdictText.className = 'verdict verdict-legit';
+                }
+
+                resultBox.style.display = 'block';
+            } catch (err) {
+                errorBox.textContent = err.message || 'Error scanning link';
+                errorBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Check Link';
+            }
+        }
+    </script>
+</body>
+</html>

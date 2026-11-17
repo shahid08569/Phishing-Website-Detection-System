@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PhishGuard AI — Line by Line Code Explanation Manual</title>
+<style>
+    @page {
+        margin: 15mm 12mm;
+        size: A4;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #1e293b;
+        background: #ffffff;
+        margin: 0;
+        padding: 0;
+    }
+    .header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #ffffff;
+        padding: 24px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 6px solid #2563eb;
+    }
+    .header-banner h1 {
+        margin: 0 0 6px 0;
+        font-size: 22pt;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+    .header-banner p {
+        margin: 0;
+        font-size: 11pt;
+        color: #94a3b8;
+    }
+    .badge {
+        display: inline-block;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 8.5pt;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+    h2 {
+        color: #0f172a;
+        font-size: 15pt;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 5px;
+        margin-top: 25px;
+        margin-bottom: 12px;
+        page-break-after: avoid;
+    }
+    h3 {
+        color: #1d4ed8;
+        font-size: 12pt;
+        margin-top: 18px;
+        margin-bottom: 8px;
+        page-break-after: avoid;
+    }
+    p, li {
+        font-size: 9.8pt;
+        color: #334155;
+    }
+    ul, ol {
+        margin-top: 4px;
+        margin-bottom: 10px;
+        padding-left: 20px;
+    }
+    .code-box {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 8.8pt;
+        margin: 8px 0;
+        overflow-x: auto;
+        page-break-inside: avoid;
+        border-left: 4px solid #38bdf8;
+    }
+    .explain-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #2563eb;
+        padding: 12px 14px;
+        border-radius: 0 6px 6px 0;
+        margin-bottom: 14px;
+        page-break-inside: avoid;
+    }
+    .explain-card strong {
+        color: #0f172a;
+    }
+    .qa-box {
+        background: #fdfdfd;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+    }
+    .qa-q {
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 10pt;
+        margin-bottom: 4px;
+    }
+    .qa-a {
+        color: #334155;
+        font-size: 9.5pt;
+    }
+    .page-break {
+        page-break-before: always;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+        margin: 10px 0;
+        page-break-inside: avoid;
+    }
+    th, td {
+        padding: 6px 10px;
+        border: 1px solid #cbd5e1;
+        text-align: left;
+    }
+    th {
+        background: #0f172a;
+        color: #ffffff;
+    }
+    tr:nth-child(even) {
+        background: #f1f5f9;
+    }
+    .highlight-urdu {
+        color: #047857;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+
+<div class="header-banner">
+    <span class="badge">VIVA & PROJECT DEFENSE MANUAL</span>
+    <h1>PhishGuard AI — Line-by-Line Code Explanation</h1>
+    <p>BSCS Semester Project | Machine Learning Based Phishing Detection | Language: Roman Urdu</p>
+</div>
+
+<h2>1. Project Ka Overview (Code Ka Asal Kaam Kya Hai?)</h2>
+<div class="explain-card">
+    <p><strong>Aasan Alfaaz Mein:</strong> Hamare project mein sirf <strong>3 main files</strong> hain jinpar poora system chal raha hai:</p>
+    <ul>
+        <li><strong><code>main.py</code>:</strong> Backend Web Server jo user se URL leta hai, uske 15 features extract karta hai, aur model se pooch kar <strong>"Legit Site"</strong> ya <strong>"Fake"</strong> return karta hai.</li>
+        <li><strong><code>train.py</code>:</strong> Machine learning training script jo CSV file parh kar Logistic Regression model ko train karta hai aur <code>phishing_model.joblib</code> file save karta hai.</li>
+        <li><strong><code>index.html</code>:</strong> Single-page frontend (HTML + CSS + JavaScript) jismein search bar hai aur result show hota hai.</li>
+    </ul>
+</div>
+
+<div class="page-break"></div>
+
+<h2>2. File 1: <code>main.py</code> Ka Line-by-Line Postmortem</h2>
+
+<p>Yeh hamare web server ka main code hai. Isko 5 ahem hisson mein samjhein:</p>
+
+<h3>Hissa A: Libraries Import Karna (Lines 1 to 16)</h3>
+<div class="code-box">
+import math<br>
+import re<br>
+from collections import Counter<br>
+from urllib.parse import urlparse<br>
+from pathlib import Path<br>
+import joblib<br>
+import pandas as pd<br>
+from fastapi import FastAPI<br>
+from fastapi.responses import FileResponse<br>
+from pydantic import BaseModel<br>
+import uvicorn
+</div>
+
+<div class="explain-card">
+    <ul>
+        <li><code>import math</code>: Ganit / mathematics ke operations (jaise <code>math.log2</code> Shannon Entropy ke liye) use karne ke liye.</li>
+        <li><code>import re</code>: Regular Expression (Regex) ke liye, taake check kar sakein ke URL mein direct IP address (e.g. 192.168.1.1) mojood hai ya nahi.</li>
+        <li><code>from collections import Counter</code>: URL ke characters ko count karne ke liye (entropy formula mein har character ki tadad chahiye hoti hai).</li>
+        <li><code>from urllib.parse import urlparse</code>: Python ka built-in tool jo URL ko tod kar scheme (http), domain (netloc), path aur query alag alag kar deta hai.</li>
+        <li><code>from pathlib import Path</code>: Computer ke folder aur files ke paths ko sahi handle karne ke liye.</li>
+        <li><code>import joblib</code>: Save kiye gaye machine learning model (<code>.joblib</code>) ko memory mein load karne ke liye.</li>
+        <li><code>import pandas as pd</code>: Features ko DataFrame (row/column table) mein convert karne ke liye jo model input leta hai.</li>
+        <li><code>from fastapi import FastAPI</code>: Tez tareen aur modern web framework API banane ke liye.</li>
+        <li><code>from fastapi.responses import FileResponse</code>: Browser ko <code>index.html</code> web page send karne ke liye.</li>
+        <li><code>from pydantic import BaseModel</code>: API par aane wali request (URL) ka data type validate karne ke liye.</li>
+        <li><code>import uvicorn</code>: FastAPI ke server ko run aur host karne wala engine.</li>
+    </ul>
+</div>
+
+<h3>Hissa B: FastAPI Initialize Aur Model Load (Lines 18 to 22)</h3>
+<div class="code-box">
+app = FastAPI(title="PhishGuard AI")<br><br>
+MODEL_PATH = Path(__file__).parent / "models" / "phishing_model.joblib"<br>
+model = joblib.load(MODEL_PATH)
+</div>
+
+<div class="explain-card">
+    <ul>
+        <li><code>app = FastAPI(...)</code>: FastAPI ka server object banaya jiska naam "PhishGuard AI" rakha.</li>
+        <li><code>MODEL_PATH = ...</code>: Hamari trained model file <code>models/phishing_model.joblib</code> ka path set kiya.</li>
+        <li><code>model = joblib.load(MODEL_PATH)</code>: Model ko hard drive se utha kar RAM (memory) mein load kar liya taake scan karte waqt foran answer de sake (< 2 milliseconds).</li>
+    </ul>
+</div>
+
+<div class="page-break"></div>
+
+<h3>Hissa C: Shannon Entropy Function (Lines 25 to 30)</h3>
+<div class="code-box">
+def calculate_entropy(text: str) -> float:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if not text:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 0.0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;length = len(text)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;counts = Counter(text)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return -sum((c / length) * math.log2(c / length) for c in counts.values())
+</div>
+
+<div class="explain-card">
+    <p><strong>Is Function Ka Kaam:</strong> Yeh function URL ke andar text ki <strong>Randomness (Be-tarteebi)</strong> calculate karta hai.</p>
+    <ul>
+        <li><code>if not text: return 0.0</code>: Agar string khali ho to entropy 0 return karo.</li>
+        <li><code>length = len(text)</code>: URL ke kul characters ki ginti.</li>
+        <li><code>counts = Counter(text)</code>: Har character kitni baar aaya (e.g. 'a' kitni baar, '1' kitni baar).</li>
+        <li><code>return -sum(...)</code>: Mathematical Shannon Entropy formula: $$H(X) = -\sum P(x) \log_2 P(x)$$. Phishing links mein random tokens aur hashes hote hain is liye unki entropy high aati hai.</li>
+    </ul>
+</div>
+
+<h3>Hissa D: Feature Extraction Function (Tamam 15 Features)</h3>
+<p>Yeh function URL text se 15 features nikalta hai <strong>bina internet par website ko open kiye</strong>:</p>
+
+<div class="code-box">
+def extract_features(raw_url: str) -> dict:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;url = raw_url.strip()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if not (url.startswith("http://") or url.startswith("https://")):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url = "http://" + url<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;parsed = urlparse(url)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hostname = parsed.hostname or ""<br>
+&nbsp;&nbsp;&nbsp;&nbsp;domain = parsed.netloc<br>
+&nbsp;&nbsp;&nbsp;&nbsp;parts = domain.split(".")
+</div>
+
+<div class="explain-card">
+    <ul>
+        <li><code>url = raw_url.strip()</code>: Aage peeche ke fazool spaces khatam kiye.</li>
+        <li><code>if not url.startswith...</code>: Agar user ne <code>http://</code> ya <code>https://</code> nahi likha to default <code>http://</code> laga diya taake parser fail na ho.</li>
+        <li><code>parsed = urlparse(url)</code>: URL ko alag alag hisson mein split kiya.</li>
+        <li><code>hostname / domain</code>: Website ka main address (jaise <code>www.google.com</code>).</li>
+        <li><code>parts = domain.split(".")</code>: Domain ko dots par divide kiya (jaise <code>['www', 'google', 'com']</code>).</li>
+    </ul>
+</div>
+
+<table>
+    <tr><th>Feature Line Code</th><th>Feature Ka Naam</th><th>Roman Urdu Mein Explanation</th></tr>
+    <tr>
+        <td><code>url_length = len(url)</code></td>
+        <td>1. URL Length</td>
+        <td>Poore URL ki total character count. Phishing URLs aam tor par token aur fake subdomains ki wajah se lambi hoti hain.</td>
+    </tr>
+    <tr>
+        <td><code>is_ip = re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname)<br>has_ip_address = 1 if is_ip else 0</code></td>
+        <td>2. Has IP Address</td>
+        <td>Check karta hai ke domain ki jagah direct IP to nahi (e.g. 192.168.1.1). Agar IP ho to 1 warna 0. Hackers domain register na karne par IP use karte hain.</td>
+    </tr>
+    <tr>
+        <td><code>dot_count = url.count(".")</code></td>
+        <td>3. Dot Count</td>
+        <td>URL mein kitne dots mojood hain. Zyada dots fake subdomains indicate karte hain.</td>
+    </tr>
+    <tr>
+        <td><code>https_flag = 1 if parsed.scheme.lower() == "https" else 0</code></td>
+        <td>4. HTTPS Flag</td>
+        <td>Agar protocol HTTPS hai to 1 (Safe indicator), agar insecure HTTP hai to 0.</td>
+    </tr>
+    <tr>
+        <td><code>url_entropy = round(calculate_entropy(url), 6)</code></td>
+        <td>5. URL Entropy</td>
+        <td>Shannon entropy formula se characters ki randomness calculate karta hai.</td>
+    </tr>
+    <tr>
+        <td><code>subdomain_count = len(parts) - 2</code></td>
+        <td>6. Subdomain Count</td>
+        <td>Main domain aur TLD nikal kar dekhta hai kitne subdomains bane hain.</td>
+    </tr>
+    <tr>
+        <td><code>query_param_count = 1 if not parsed.query else len(parsed.query.split("&"))</code></td>
+        <td>7. Query Param Count</td>
+        <td>URL query string ke andar <code>?</code> aur <code>&</code> parameters ki tadad.</td>
+    </tr>
+    <tr>
+        <td><code>tld_length = len(parts[-1]) if parts else 0</code></td>
+        <td>8. TLD Length</td>
+        <td>Top-Level Domain ki length (e.g. <code>.com</code> ki 3, <code>.accountant</code> ki 10).</td>
+    </tr>
+    <tr>
+        <td><code>path_length = len(parsed.path)</code></td>
+        <td>9. Path Length</td>
+        <td>Domain ke baad aane wale folder/page path ki character length.</td>
+    </tr>
+    <tr>
+        <td><code>has_hyphen_in_domain = 1 if "-" in domain else 0</code></td>
+        <td>10. Hyphen in Domain</td>
+        <td>Check karta hai domain mein '-' hai ya nahi. Phishers fake brand names (e.g. <code>paypal-verify.com</code>) banate waqt hyphen lagate hain.</td>
+    </tr>
+    <tr>
+        <td><code>number_of_digits = sum(1 for c in url if c.isdigit())</code></td>
+        <td>11. Number of Digits</td>
+        <td>URL ke andar kul kitne numbers/digits (0 se 9) mojood hain.</td>
+    </tr>
+    <tr>
+        <td><code>tld = parts[-1].split(":")[0].lower()<br>tld_popularity = 1 if tld in ["com", "org", "net", "edu", "gov"] else 0</code></td>
+        <td>12. TLD Popularity</td>
+        <td>Agar TLD reputable hai (.com, .org, .edu) to 1, agar shady sasti TLD hai (.xyz, .top, .tk) to 0.</td>
+    </tr>
+    <tr>
+        <td><code>suspicious_exts = [".exe", ".zip", ".apk", ".js", ".bin"]<br>suspicious_file_extension = 1 if any(...) else 0</code></td>
+        <td>13. Suspicious File Extension</td>
+        <td>Agar URL ke aakhir mein virus/malware wali extensions (.exe, .zip, .apk) hon to 1, warna 0.</td>
+    </tr>
+    <tr>
+        <td><code>domain_name_length = len(parts[-2]) if len(parts) >= 2 else 0</code></td>
+        <td>14. Domain Name Length</td>
+        <td>Asal brand name ki length (jaise <code>google.com</code> mein 'google' ki length 6).</td>
+    </tr>
+    <tr>
+        <td><code>pct_numeric = (100.0 * number_of_digits / url_length)</code></td>
+        <td>15. Percentage Numeric Chars</td>
+        <td>Poore URL mein digits ki percentage.</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h3>Hissa E: API Endpoints (Lines 75 to 97)</h3>
+<div class="code-box">
+class URLRequest(BaseModel):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;url: str<br><br>
+@app.get("/")<br>
+def home():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return FileResponse(Path(__file__).parent / "index.html")<br><br>
+@app.post("/api/predict")<br>
+def predict(req: URLRequest):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;features = extract_features(req.url)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;input_data = pd.DataFrame([features])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;prediction = int(model.predict(input_data)[0])<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;if prediction == 1:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return {"result": "Fake"}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return {"result": "Legit Site"}
+</div>
+
+<div class="explain-card">
+    <ul>
+        <li><code>class URLRequest(BaseModel)</code>: Frontend se aane wale JSON data ka structure define kiya ke usme <code>url</code> string honi chahiye.</li>
+        <li><code>@app.get("/")</code>: Jab user browser mein <code>http://127.0.0.1:8000</code> kholta hai, to yeh function seedha <code>index.html</code> page show kar deta hai.</li>
+        <li><code>@app.post("/api/predict")</code>: Scan karne ka main endpoint:
+            <ol>
+                <li>URL leta hai aur <code>extract_features</code> se 15 features banata hai.</li>
+                <li>Un features ko <code>pd.DataFrame</code> mein convert karta hai.</li>
+                <li><code>model.predict(...)</code> se prediction leta hai:
+                    <ul>
+                        <li>Agar <strong>1</strong> aaya $\rightarrow$ return <code>{"result": "Fake"}</code></li>
+                        <li>Agar <strong>0</strong> aaya $\rightarrow$ return <code>{"result": "Legit Site"}</code></li>
+                    </ul>
+                </li>
+            </ol>
+        </li>
+    </ul>
+</div>
+
+<h3>Hissa F: Server Run Karna (Lines 99 to 105)</h3>
+<div class="code-box">
+if __name__ == "__main__":<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print("PhishGuard AI Server Started Successfully!")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uvicorn.run(app, host="127.0.0.1", port=8000)
+</div>
+
+<div class="explain-card">
+    <p>Jab aap terminal mein <code>python main.py</code> likhte hain, to yeh block chalta hai aur Uvicorn server ko local port <code>8000</code> par live chala deta hai.</p>
+</div>
+
+<div class="page-break"></div>
+
+<h2>3. File 2: <code>train.py</code> Ka Line-by-Line Postmortem</h2>
+
+<p>Yeh script hamare Machine Learning model ko train kar ke save karta hai:</p>
+
+<div class="code-box">
+import pandas as pd<br>
+import joblib<br>
+from sklearn.linear_model import LogisticRegression<br>
+from sklearn.preprocessing import StandardScaler<br>
+from sklearn.pipeline import Pipeline<br>
+from sklearn.model_selection import GroupShuffleSplit<br>
+from pathlib import Path
+</div>
+
+<div class="explain-card">
+    <p><strong>Imports:</strong> <code>LogisticRegression</code> hamara classification algorithm hai, <code>StandardScaler</code> features ko normal scale par lane ke liye hai, aur <code>GroupShuffleSplit</code> data leakage rokne ke liye hai.</p>
+</div>
+
+<div class="code-box">
+csv_file = Path(__file__).parent / "url_features_extracted1.csv"<br>
+df = pd.read_csv(csv_file)<br><br>
+df["target"] = 1 - df["ClassLabel"]
+</div>
+
+<div class="explain-card">
+    <p><strong>Line 13 (Target Transformation):</strong><br>
+    Original dataset mein <code>0 = Phishing</code> tha aur <code>1 = Legit</code> tha. Data Science conventions mein target (positive class) hamesha <strong>1</strong> hona chahiye us cheez ke liye jisko detect karna ho (yani Phishing = 1). Is liye humne <code>1 - ClassLabel</code> kiya. Ab:
+    <br>$\rightarrow$ <strong>1 = Phishing (Fake)</strong>
+    <br>$\rightarrow$ <strong>0 = Legitimate (Legit Site)</strong>
+    </p>
+</div>
+
+<div class="code-box">
+features = [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"url_length", "has_ip_address", "dot_count", "https_flag", "url_entropy",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"subdomain_count", "query_param_count", "tld_length", "path_length",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"has_hyphen_in_domain", "number_of_digits", "tld_popularity",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"suspicious_file_extension", "domain_name_length", "percentage_numeric_chars"<br>
+]<br>
+X = df[features]<br>
+y = df["target"]
+</div>
+
+<div class="explain-card">
+    <p><code>X</code> hamara input data (15 features) hai aur <code>y</code> hamara target label (Fake ya Legit) hai.</p>
+</div>
+
+<div class="code-box">
+gss = GroupShuffleSplit(n_splits=1, test_size=0.20, random_state=42)<br>
+train_idx, test_idx = next(gss.split(X, y, groups=df["host"]))<br><br>
+X_train, y_train = X.iloc[train_idx], y.iloc[train_idx]<br>
+X_test, y_test = X.iloc[test_idx], y.iloc[test_idx]
+</div>
+
+<div class="explain-card">
+    <p><strong>Yeh Project Ka Sab Se Bara Technical Weapon Hai (Group Validation):</strong><br>
+    Agar aap aam <code>train_test_split</code> lagayein to ek hi domain ke do pages (e.g. <code>fakebank.com/a</code> aur <code>fakebank.com/b</code>) train aur test dono mein chale jate hain. Model domain ratta laga leta hai aur fake 99% accuracy dikhata hai (Data Leakage).<br>
+    <code>GroupShuffleSplit(groups=df["host"])</code> use karne se poora domain ya train mein rehta hai ya test mein. Is se model <strong>unseen websites</strong> par test hota hai.</p>
+</div>
+
+<div class="code-box">
+pipeline = Pipeline([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;("scaler", StandardScaler()),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;("model", LogisticRegression(class_weight="balanced", max_iter=1000, random_state=42))<br>
+])<br><br>
+pipeline.fit(X_train, y_train)<br>
+score = pipeline.score(X_test, y_test)<br>
+print(f"Accuracy: {score * 100:.2f}%")
+</div>
+
+<div class="explain-card">
+    <ul>
+        <li><code>Pipeline</code>: Dono steps ko jodd diya — pehle StandardScaler data ko scale karega, phir LogisticRegression predict karega.</li>
+        <li><code>class_weight="balanced"</code>: Taake phishing links par zyada dhyan de aur koi fraud link miss na ho (False Negative minimize ho).</li>
+        <li><code>pipeline.fit(...)</code>: Model ne data se patterns seekh liye (Training ho gayi).</li>
+        <li><code>pipeline.score(...)</code>: Test data par accuracy check ki.</li>
+    </ul>
+</div>
+
+<div class="code-box">
+model_path = Path(__file__).parent / "models" / "phishing_model.joblib"<br>
+model_path.parent.mkdir(parents=True, exist_ok=True)<br>
+joblib.dump(pipeline, model_path)<br>
+print("Saved to:", model_path)
+</div>
+
+<div class="explain-card">
+    <p>Train hue model ko <code>models/phishing_model.joblib</code> file mein save kar diya taake <code>main.py</code> isay direct use kar sake.</p>
+</div>
+
+<div class="page-break"></div>
+
+<h2>4. File 3: <code>index.html</code> Ka Line-by-Line Postmortem</h2>
+
+<p>Hamara frontend single-file architecture par bana hai jismein HTML, CSS aur JavaScript teeno aik hi jagah hain:</p>
+
+<h3>A. CSS Styling:</h3>
+<div class="explain-card">
+    <ul>
+        <li><code>body { background-color: #0f172a; ... }</code>: Neutral professional dark background set kiya.</li>
+        <li><code>.card { background-color: #1e293b; ... }</code>: Screen ke center mein clean box banaya jismein input bar hai.</li>
+        <li><code>.verdict-legit { background-color: #064e3b; color: #34d399; }</code>: Jab genuine site ho to green color mein <strong>"Legit Site"</strong> dikhane ke liye.</li>
+        <li><code>.verdict-fake { background-color: #7f1d1d; color: #f87171; }</code>: Jab phishing site ho to red color mein <strong>"Fake"</strong> dikhane ke liye.</li>
+    </ul>
+</div>
+
+<h3>B. HTML Layout:</h3>
+<div class="explain-card">
+    <ul>
+        <li><code>&lt;h1&gt;PhishGuard AI&lt;/h1&gt;</code>: Page ka clean title.</li>
+        <li><code>&lt;input id="urlInput" placeholder="Enter website link here..."&gt;</code>: Jahan user URL paste karta hai.</li>
+        <li><code>&lt;button id="scanBtn"&gt;Check Link&lt;/button&gt;</code>: Click karne par scan trigger karta hai.</li>
+        <li><code>&lt;button onclick="setURL(...)"&gt;Google&lt;/button&gt;</code>: Quick testing ke liye Google aur PayPal ke do sample buttons.</li>
+        <li><code>&lt;div id="verdictText" class="verdict"&gt;&lt;/div&gt;</code>: Jahan 'Legit Site' ya 'Fake' ka text show hota hai.</li>
+    </ul>
+</div>
+
+<h3>C. JavaScript Code (Scanning Logic):</h3>
+<div class="code-box">
+function setURL(url) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;document.getElementById('urlInput').value = url;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;document.getElementById('errorBox').style.display = 'none';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;document.getElementById('resultBox').style.display = 'none';<br>
+}
+</div>
+<div class="explain-card">
+    <p>Yeh function sample button (Google/PayPal) par click karne par input box mein link paste kar deta hai.</p>
+</div>
+
+<div class="code-box">
+async function scanURL(e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;e.preventDefault();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const url = document.getElementById('urlInput').value.trim();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (!url) return;<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;const response = await fetch('/api/predict', {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;method: 'POST',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;headers: { 'Content-Type': 'application/json' },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;body: JSON.stringify({ url: url })<br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;const data = await response.json();<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (data.label === 1) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;verdictText.textContent = 'Fake';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;verdictText.className = 'verdict verdict-fake';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;} else {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;verdictText.textContent = 'Legit Site';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;verdictText.className = 'verdict verdict-legit';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;resultBox.style.display = 'block';<br>
+}
+</div>
+
+<div class="explain-card">
+    <p><strong>JavaScript Ka Asal Flow:</strong><br>
+    1. <code>fetch('/api/predict')</code>: Backend ko URL send karta hai.<br>
+    2. Backend se <code>data.label</code> wapas aata hai.<br>
+    3. Agar <code>label === 1</code> ho to text <strong>"Fake"</strong> aur color Red ho jata hai.<br>
+    4. Agar <code>label === 0</code> ho to text <strong>"Legit Site"</strong> aur color Green ho jata hai.<br>
+    5. Result box ko screen par display kar deta hai.
+    </p>
+</div>
+
+<div class="page-break"></div>
+
+<h2>5. Top 10 Viva / Defense Questions (Teachers Ke Sawaalat)</h2>
+
+<div class="qa-box">
+    <div class="qa-q">Q1: Aapka model URL ko scan karne ke liye internet par open kyun nahi karta?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Sir, agar hum submitted URL par request bhejein to malicious scripts run hone ka khatra hota hai, aur network request 3 se 5 seconds leti hai jabke offline lexical extraction sirf microseconds mein complete ho jati hai.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q2: Shannon Entropy feature ka kya faida hai?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Shannon Entropy URL characters ki randomness aur disorder ko measure karti hai. Phishing links mein random tokens aur encoded hashes hote hain jis se unki entropy normal websites se wazeh tor par zyada aati hai.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q3: Machine Learning mein Data Leakage kya hota hai aur aapne kaise roka?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Agar ek hi domain ke URLs train aur test dono mein chale jayein to model domain ko memorize kar leta hai aur fake 99% accuracy dikhata hai. Humne <code>GroupShuffleSplit(groups=df["host"])</code> lagaya taake poora domain ya train mein rahe ya test mein.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q4: Dataset ke original labels mein <code>1 - ClassLabel</code> kyun kiya?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Original CSV mein 0 Phishing tha aur 1 Legitimate tha. Data Science conventions mein target hamesha positive class (detect hone wala target) 1 hona chahiye. Is liye humne <code>1 - ClassLabel</code> kar ke 1 = Phishing standardize kiya.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q5: StandardScaler Pipeline ke andar lagane ka kya faida hai?</div>
+    <div class="qa-a"><strong>Jawab:</strong> URL length ki value 50-100 tak hoti hai jabke IP address ya HTTPS flag sirf 0 ya 1 hote hain. StandardScaler sab features ko 0 mean aur unit variance par normal scale par le aata hai taake Logistic Regression ka decision balance rahe.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q6: Agar user URL ke shuru mein <code>http://</code> na likhe to kya code crash karega?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Nahi sir, <code>extract_features</code> function ki pehli line check karti hai: agar scheme missing ho to wo automatically <code>http://</code> prepend kar deti hai taake standard URL parser crash na ho.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q7: Logistic Regression hi kyun use kiya, Neural Network kyun nahi?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Logistic Regression fast hai, low memory leti hai, aur sab se ahem baat ye ke ye black-box nahi hai — iske 15 weights 100% explainable hain jo cyber security mein bohot zaroori hota hai.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q8: Frontend aur Backend aapas mein kaise baat karte hain?</div>
+    <div class="qa-a"><strong>Jawab:</strong> JavaScript ka <code>fetch()</code> method asynchronous POST request ke zariye JSON payload <code>{"url": "..."}</code> backend ke <code>/api/predict</code> endpoint par bhejta hai, aur wahan se return hone wala result screen par update kar deta hai.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q9: <code>joblib</code> ka kya role hai?</div>
+    <div class="qa-a"><strong>Jawab:</strong> <code>train.py</code> mein model train hone ke baad <code>joblib.dump()</code> model ko file mein freeze karta hai, aur <code>main.py</code> mein <code>joblib.load()</code> usay memory mein reload karta hai taake bar bar train na karna pade.</div>
+</div>
+
+<div class="qa-box">
+    <div class="qa-q">Q10: Kya is project ko chalane ke liye database ki zaroorat hai?</div>
+    <div class="qa-a"><strong>Jawab:</strong> Nahi sir, hamara architecture stateless aur real-time hai. Model seedha memory mein chal raha hai is liye database ke baghair ultra-fast prediction karta hai.</div>
+</div>
+
+</body>
+</html>

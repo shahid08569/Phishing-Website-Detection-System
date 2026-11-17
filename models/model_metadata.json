@@ -1,0 +1,102 @@
+{
+  "model_name": "Logistic Regression (default weights)",
+  "algorithm": "Logistic Regression",
+  "model_version": "v202611112139",
+  "dataset_name": "url_features_extracted1.csv",
+  "dataset_hash": "9341fe52fbba1ded1436e6256d86487637fc9643416fa3348601bf4ac4fd7b14",
+  "split_method": "GroupShuffleSplit (groups=host, test_size=0.20, random_state=42)",
+  "train_rows": 824,
+  "test_rows": 176,
+  "trained_at": "2026-11-11T16:39:55.036508Z",
+  "features": [
+    "url_length",
+    "has_ip_address",
+    "dot_count",
+    "https_flag",
+    "url_entropy",
+    "subdomain_count",
+    "query_param_count",
+    "tld_length",
+    "path_length",
+    "has_hyphen_in_domain",
+    "number_of_digits",
+    "tld_popularity",
+    "suspicious_file_extension",
+    "domain_name_length",
+    "percentage_numeric_chars"
+  ],
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "true_negatives": 96,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "true_positives": 80,
+    "confusion_matrix": [
+      [
+        96,
+        0
+      ],
+      [
+        0,
+        80
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 96.0
+      },
+      "1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 80.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 176.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 176.0
+      }
+    }
+  },
+  "coefficients": {
+    "url_length": 0.7541,
+    "has_ip_address": 0.7005,
+    "dot_count": 0.189,
+    "https_flag": -1.8096,
+    "url_entropy": 0.4039,
+    "subdomain_count": -0.2643,
+    "query_param_count": 0.9041,
+    "tld_length": 0.0799,
+    "path_length": 0.8637,
+    "has_hyphen_in_domain": 1.1916,
+    "number_of_digits": 0.4419,
+    "tld_popularity": -0.76,
+    "suspicious_file_extension": 0.1808,
+    "domain_name_length": 0.644,
+    "percentage_numeric_chars": 0.5272
+  },
+  "clean_summary": {
+    "raw_rows": 1000,
+    "clean_rows": 1000,
+    "empty_label_dropped": 0,
+    "duplicates_dropped": 0,
+    "schemeless_dropped": 0,
+    "phishing_count": 600,
+    "legitimate_count": 400,
+    "phishing_ratio": 0.6
+  }
+}

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+env/
+venv/
+
+# Archives & Temp Files
+*.zip
+*.tar.gz
+*.rar
+
+# Subfolder Duplicates
+AI Project Website Phishing/
+
+# IDE
+.vscode/
+.idea/
+*.swp
